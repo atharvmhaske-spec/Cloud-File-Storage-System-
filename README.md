@@ -8,21 +8,27 @@ A web-based application that allows users to **upload, store, manage, and downlo
 
 * ☁️ Cloud-based file storage
 * 📤 Upload files
-* 📥 Download files
+* 📂 View and manage stored files
+* ⭐ Star important files for quick access
+* 📥 Download stored files
+* 🔗 Share files securely
 * 🗑️ Delete files
 * 🔍 Search and manage files
 * 🔐 Secure user login
 * 👤 User dashboard
 * 📊 Storage usage tracking
 
+
 # 🛠️ Technologies Used
 
-* HTML
-* CSS
-* JavaScript
+* AWS
+* AWS S3
+* AWS IAM
+* Web Development
 * Python
+* flask
 * MySQL
-* ☁️ AWS S3
+
 
 # 🎯 Objectives
 
@@ -36,7 +42,13 @@ A web-based application that allows users to **upload, store, manage, and downlo
 The system uses **Amazon S3** for storing files securely in the cloud.
 
 ```text
-User → Web Application → Python Backend → AWS S3
+                  ┌───────────→ AWS S3
+                  │              (File Storage)
+User → Web Application → Python Backend
+                  │
+                  └───────────→ MySQL
+                                 (User & File Data)
+
 ```
 
 # 🚀 Future Scope
