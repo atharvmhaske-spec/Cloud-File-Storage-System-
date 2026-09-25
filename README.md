@@ -13,7 +13,6 @@ A web-based application that allows users to **upload, store, manage, and downlo
 * 🔍 Search and manage files
 * 🔐 Secure user login
 * 👤 User dashboard
-* 👨‍💼 Admin dashboard
 * 📊 Storage usage tracking
 
 # 🛠️ Technologies Used
