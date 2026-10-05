@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="color-scheme"
+        content="light"
+    >
+
+    <title>CloudStorage - Share Files</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .navbar {
+            height: 70px;
+            padding: 0 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2563eb;
+            font-size: 22px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .dashboard-btn {
+            padding: 11px 20px;
+            border-radius: 9px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .dashboard-btn:hover {
+            background: #1d4ed8;
+        }
+
+
+        /* =====================================================
+           PAGE
+        ===================================================== */
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .share-card {
+            padding: 32px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            margin: 0;
+            color: #111827;
+            font-size: 28px;
+        }
+
+        .description {
+            margin: 8px 0 28px;
+            color: #6b7280;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+
+        /* =====================================================
+           FLASH
+        ===================================================== */
+
+        .flash {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border-radius: 9px;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #047857;
+        }
+
+
+        /* =====================================================
+           FILES
+        ===================================================== */
+
+        .section-title {
+            margin-bottom: 12px;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .count {
+            display: inline-block;
+            margin-bottom: 12px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .files {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .file {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 15px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9px;
+            background: #eff6ff;
+            font-size: 20px;
+        }
+
+        .details {
+            min-width: 0;
+        }
+
+        .name {
+            overflow: hidden;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 600;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .meta {
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+
+        /* =====================================================
+           EXPIRY
+        ===================================================== */
+
+        .group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .expiry {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 9px;
+        }
+
+        .expiry button {
+            padding: 12px 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #fff;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .expiry button:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .expiry button.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+
+        .info {
+            margin-top: 10px;
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           SUBMIT
+        ===================================================== */
+
+        .submit {
+            width: 100%;
+            height: 50px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 18px rgba(37, 99, 235, 0.25);
+        }
+
+        .submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+
+        /* =====================================================
+           GENERATED LINK
+        ===================================================== */
+
+        .links {
+            margin-top: 32px;
+            padding-top: 28px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .links h2 {
+            margin: 0 0 6px;
+            color: #111827;
+            font-size: 18px;
+        }
+
+        .links p {
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .link-card {
+            margin-top: 12px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+        }
+
+        .link-name {
+            color: #111827;
+            font-size: 14px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .expiry-text {
+            display: inline-block;
+            margin: 8px 0 10px;
+            padding: 5px 9px;
+            border-radius: 20px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .link-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .link-input {
+            flex: 1;
+            min-width: 0;
+            height: 46px;
+            padding: 0 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            color: #111827;
+            font-size: 12px;
+        }
+
+        .copy {
+            height: 46px;
+            padding: 0 17px;
+            border: 0;
+            border-radius: 8px;
+            background: #111827;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+
+        .copy:hover {
+            background: #374151;
+        }
+
+
+        /* =====================================================
+           MULTIPLE FILE SHARE PANEL
+        ===================================================== */
+
+        .bulk-share-panel {
+            margin-top: 32px;
+            padding-top: 28px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .bulk-share-title {
+            margin-bottom: 6px;
+            color: #111827;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .bulk-share-description {
+            margin-bottom: 18px;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .bulk-share-summary {
+            margin-bottom: 18px;
+            padding: 13px 15px;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #1e40af;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           INDIVIDUAL FILE NUMBER
+        ===================================================== */
+
+        .file-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 25px;
+            height: 25px;
+            margin-right: 7px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            vertical-align: middle;
+        }
+
+
+        /* =====================================================
+           SHARE OPTIONS
+        ===================================================== */
+
+        .share-options {
+            margin-top: 22px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .share-options-title {
+            margin-bottom: 12px;
+            color: #111827;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 9px;
+        }
+
+        .share-btn {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid #d1d5db;
+            border-radius: 9px;
+            background: #fff;
+            color: #374151;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-1px);
+            border-color: #2563eb;
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.07);
+        }
+
+        .share-btn.native {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: #fff;
+        }
+
+        .share-btn.native:hover {
+            background: #1d4ed8;
+        }
+
+        .share-btn.whatsapp:hover {
+            border-color: #22c55e;
+        }
+
+        .share-btn.telegram:hover {
+            border-color: #0ea5e9;
+        }
+
+        .share-btn.email:hover {
+            border-color: #6366f1;
+        }
+
+        .share-btn.sms:hover {
+            border-color: #8b5cf6;
+        }
+
+        .share-btn.linkedin:hover,
+        .share-btn.facebook:hover {
+            border-color: #2563eb;
+        }
+
+        .share-btn.x:hover {
+            border-color: #111827;
+        }
+
+
+        /* =====================================================
+           S3 NOTE
+        ===================================================== */
+
+        .s3-note {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border: 1px solid #bfdbfe;
+            border-radius: 9px;
+            background: #eff6ff;
+            color: #1e40af;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+
+        /* =====================================================
+           FAILED
+        ===================================================== */
+
+        .failed {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #fed7aa;
+            border-radius: 10px;
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .failed h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           EMPTY
+        ===================================================== */
+
+        .empty {
+            padding: 35px 20px;
+            border: 1px dashed #d1d5db;
+            border-radius: 12px;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            color: #374151;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            .share-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                height: 64px;
+                padding: 0 16px;
+            }
+
+            .brand {
+                font-size: 18px;
+            }
+
+            .brand-icon {
+                width: 34px;
+                height: 34px;
+            }
+
+            .dashboard-btn {
+                padding: 10px 13px;
+                font-size: 12px;
+            }
+
+            .page-wrapper {
+                margin: 25px auto;
+                padding: 0 12px;
+            }
+
+            .share-card {
+                padding: 22px 17px;
+                border-radius: 14px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+
+            .description {
+                font-size: 13px;
+            }
+
+            .expiry {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .expiry button {
+                min-height: 44px;
+            }
+
+            .link-row {
+                flex-direction: column;
+            }
+
+            .link-input,
+            .copy {
+                width: 100%;
+                height: 44px;
+            }
+
+            .submit {
+                height: 52px;
+            }
+
+        }
+
+
+        @media (max-width: 420px) {
+
+            .share-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .share-btn {
+                font-size: 12px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <nav class="navbar">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="brand"
+        >
+
+            <span class="brand-icon">
+                ☁
+            </span>
+
+            CloudStorage
+
+        </a>
+
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="dashboard-btn"
+        >
+            ← Dashboard
+        </a>
+
+    </nav>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
+
+    <main class="page-wrapper">
+
+        <div class="share-card">
+
+
+            <!-- =================================================
+                 TITLE
+            ================================================= -->
+
+            <h1>
+
+                {% if files|length == 1 %}
+
+                    Share File
+
+                {% else %}
+
+                    Share Files
+
+                {% endif %}
+
+            </h1>
+
+
+            <p class="description">
+
+                {% if files|length == 1 %}
+
+                    Generate a direct Amazon S3 sharing URL for
+                    the selected file.
+
+                {% else %}
+
+                    Generate sharing links for all selected files.
+                    Each file will have its own temporary S3 URL.
+
+                {% endif %}
+
+            </p>
+
+
+
+            <!-- =================================================
+                 FLASH MESSAGES
+            ================================================= -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div
+                        class="flash
+                        {% if category == 'error' %}
+                            error
+                        {% else %}
+                            success
+                        {% endif %}
+                    "
+                    >
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+
+            <!-- =================================================
+                 SELECTED FILES
+            ================================================= -->
+
+            <div class="section-title">
+                Selected Files
+            </div>
+
+
+            {% if files %}
+
+
+                <div class="count">
+
+                    {{ files|length }}
+
+                    {% if files|length == 1 %}
+
+                        file
+
+                    {% else %}
+
+                        files
+
+                    {% endif %}
+
+                    selected
+
+                </div>
+
+
+
+                <div class="files">
+
+
+                    {% for file in files %}
+
+                        <div class="file">
+
+
+                            <div class="icon">
+
+                                {% if file.extension in [
+                                    'jpg',
+                                    'jpeg',
+                                    'png',
+                                    'gif',
+                                    'webp',
+                                    'bmp',
+                                    'svg',
+                                    'ico',
+                                    'avif'
+                                ] %}
+
+                                    🖼️
+
+                                {% elif file.extension in [
+                                    'mp4',
+                                    'avi',
+                                    'mov',
+                                    'mkv',
+                                    'webm'
+                                ] %}
+
+                                    🎬
+
+                                {% elif file.extension in [
+                                    'mp3',
+                                    'wav',
+                                    'ogg',
+                                    'm4a'
+                                ] %}
+
+                                    🎵
+
+                                {% elif file.extension == 'pdf' %}
+
+                                    📕
+
+                                {% elif file.extension in [
+                                    'doc',
+                                    'docx',
+                                    'txt'
+                                ] %}
+
+                                    📘
+
+                                {% elif file.extension in [
+                                    'xls',
+                                    'xlsx',
+                                    'csv'
+                                ] %}
+
+                                    📊
+
+                                {% elif file.extension in [
+                                    'ppt',
+                                    'pptx'
+                                ] %}
+
+                                    📙
+
+                                {% else %}
+
+                                    📄
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="details">
+
+                                <div class="name">
+                                    {{ file.name }}
+                                </div>
+
+                                <div class="meta">
+
+                                    {{
+                                        file.extension|upper
+                                        if file.extension
+                                        else 'FILE'
+                                    }}
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                    {% endfor %}
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     SHARE FORM
+                ================================================= -->
+
+                <form
+                    id="shareForm"
+                    method="POST"
+                    action="{% if files|length == 1 %}{{ url_for('share', key=files[0].key) }}{% else %}{{ url_for('bulk_share') }}{% endif %}"
+                >
+
+
+                    {% for file in files %}
+
+                        <input
+                            type="hidden"
+                            name="keys"
+                            value="{{ file.key }}"
+                        >
+
+                    {% endfor %}
+
+
+
+                    <!-- =================================================
+                         EXPIRY
+                    ================================================= -->
+
+                    <div class="group">
+
+
+                        <label for="minutes">
+                            Link Expiry
+                        </label>
+
+
+                        <div class="expiry">
+
+
+                            <button
+                                type="button"
+                                data-minutes="15"
+                                class="active"
+                            >
+                                15 Minutes
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-minutes="60"
+                            >
+                                1 Hour
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-minutes="1440"
+                            >
+                                1 Day
+                            </button>
+
+
+                            <button
+                                type="button"
+                                data-minutes="10080"
+                            >
+                                7 Days
+                            </button>
+
+
+                        </div>
+
+
+
+                        <div
+                            class="info"
+                            id="expiryInfo"
+                        >
+                            The S3 presigned URL will expire
+                            after 15 minutes.
+                        </div>
+
+
+
+                        <input
+                            type="hidden"
+                            id="minutes"
+                            name="minutes"
+                            value="{{ minutes or 15 }}"
+                        >
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         GENERATE
+                    ================================================= -->
+
+                    <button
+                        class="submit"
+                        id="submitBtn"
+                        type="submit"
+                    >
+
+                        🔗
+
+                        {% if files|length == 1 %}
+
+                            Generate S3 Share Link
+
+                        {% else %}
+
+                            Generate Share Links
+
+                        {% endif %}
+
+                    </button>
+
+
+                </form>
+
+
+            {% else %}
+
+
+                <!-- =================================================
+                     EMPTY
+                ================================================= -->
+
+                <div class="empty">
+
+                    📂
+
+                    <br><br>
+
+                    No files were selected.
+
+                    <br>
+
+
+                    <a
+                        class="back"
+                        href="{{ url_for('dashboard') }}"
+                    >
+                        ← Back to Dashboard
+                    </a>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+
+            <!-- =====================================================
+                 SINGLE FILE GENERATED LINK
+
+                 THIS SECTION IS KEPT FOR SINGLE FILE SHARING.
+            ===================================================== -->
+
+            {% if files|length == 1 and (share_links or share_url) %}
+
+
+                <div class="links">
+
+
+                    <h2>
+                        ✓ Amazon S3 Link Generated
+                    </h2>
+
+
+                    <p>
+
+                        The value below is the actual Amazon S3
+                        presigned URL returned by
+                        <code>boto3.generate_presigned_url()</code>.
+
+                    </p>
+
+
+                    <div class="s3-note">
+
+                        🔐
+
+                        <strong>
+                            Temporary S3 link:
+                        </strong>
+
+                        Anyone who has this URL can access the
+                        object until the selected expiry time.
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         SINGLE SHARE LINKS
+                    ================================================= -->
+
+                    {% for link in share_links %}
+
+
+                        <div
+                            class="link-card"
+                            data-share-url="{{ link.url }}"
+                            data-share-name="{{ link.name }}"
+                        >
+
+
+                            <div class="link-name">
+                                {{ link.name }}
+                            </div>
+
+
+                            <div class="expiry-text">
+
+                                ⏱ Valid for:
+                                {{ link.validity }}
+
+                            </div>
+
+
+                            <div class="link-row">
+
+
+                                <input
+                                    class="link-input"
+                                    value="{{ link.url }}"
+                                    readonly
+                                >
+
+
+                                <button
+                                    class="copy"
+                                    type="button"
+                                    onclick="copyLink(this)"
+                                >
+                                    Copy
+                                </button>
+
+
+                            </div>
+
+
+
+                            <!-- =================================================
+                                 SINGLE FILE SOCIAL SHARE
+                            ================================================= -->
+
+                            <div class="share-options">
+
+
+                                <div class="share-options-title">
+                                    📤 Share this file via
+                                </div>
+
+
+                                <div class="share-buttons">
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn native"
+                                        onclick="nativeShare(this)"
+                                    >
+                                        📤 Share
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn whatsapp"
+                                        onclick="shareWhatsApp(this)"
+                                    >
+                                        💬 WhatsApp
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn telegram"
+                                        onclick="shareTelegram(this)"
+                                    >
+                                        ✈️ Telegram
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn email"
+                                        onclick="shareEmail(this)"
+                                    >
+                                        📧 Email
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn sms"
+                                        onclick="shareSMS(this)"
+                                    >
+                                        💬 SMS
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn linkedin"
+                                        onclick="shareLinkedIn(this)"
+                                    >
+                                        💼 LinkedIn
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn facebook"
+                                        onclick="shareFacebook(this)"
+                                    >
+                                        📘 Facebook
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn x"
+                                        onclick="shareX(this)"
+                                    >
+                                        𝕏 X
+                                    </button>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endfor %}
+
+
+
+                    <!-- =================================================
+                         SINGLE LINK FALLBACK
+                    ================================================= -->
+
+                    {% if not share_links and share_url %}
+
+
+                        <div
+                            class="link-card"
+                            data-share-url="{{ share_url }}"
+                            data-share-name="{{ name }}"
+                        >
+
+
+                            <div class="link-name">
+                                {{ name }}
+                            </div>
+
+
+                            <div class="link-row">
+
+
+                                <input
+                                    class="link-input"
+                                    value="{{ share_url }}"
+                                    readonly
+                                >
+
+
+                                <button
+                                    class="copy"
+                                    type="button"
+                                    onclick="copyLink(this)"
+                                >
+                                    Copy
+                                </button>
+
+
+                            </div>
+
+
+
+                            <div class="share-options">
+
+
+                                <div class="share-options-title">
+                                    📤 Share this file via
+                                </div>
+
+
+                                <div class="share-buttons">
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn native"
+                                        onclick="nativeShare(this)"
+                                    >
+                                        📤 Share
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn whatsapp"
+                                        onclick="shareWhatsApp(this)"
+                                    >
+                                        💬 WhatsApp
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn telegram"
+                                        onclick="shareTelegram(this)"
+                                    >
+                                        ✈️ Telegram
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn email"
+                                        onclick="shareEmail(this)"
+                                    >
+                                        📧 Email
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn sms"
+                                        onclick="shareSMS(this)"
+                                    >
+                                        💬 SMS
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn linkedin"
+                                        onclick="shareLinkedIn(this)"
+                                    >
+                                        💼 LinkedIn
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn facebook"
+                                        onclick="shareFacebook(this)"
+                                    >
+                                        📘 Facebook
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="share-btn x"
+                                        onclick="shareX(this)"
+                                    >
+                                        𝕏 X
+                                    </button>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+
+            <!-- =====================================================
+                 MULTIPLE FILE GENERATED LINKS
+
+                 IMPORTANT:
+                 EVERY FILE LINK IS DISPLAYED HERE.
+
+                 SINGLE FILE SECTION ABOVE IS NOT CHANGED.
+            ===================================================== -->
+
+            {% if files|length > 1 and (share_url or bulk_share_url or share_links) %}
+
+
+                <div class="bulk-share-panel">
+
+
+                    <div class="bulk-share-title">
+                        ✓ Files Ready to Share
+                    </div>
+
+
+                    <div class="bulk-share-description">
+
+                        Your selected files have been processed.
+                        Each file has its own temporary Amazon S3
+                        sharing URL.
+
+                    </div>
+
+
+                    <div class="bulk-share-summary">
+
+                        📁
+
+                        <strong>
+                            {{ files|length }} files selected
+                        </strong>
+
+                        <br>
+
+
+                        {% if share_links %}
+
+                            {{ share_links|length }}
+
+                            individual share link{% if share_links|length != 1 %}s{% endif %}
+
+                            generated.
+
+                        {% else %}
+
+                            Share links are ready.
+
+                        {% endif %}
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ALL INDIVIDUAL GENERATED LINKS
+                    ================================================= -->
+
+                    {% if share_links %}
+
+
+                        {% for link in share_links %}
+
+
+                            <div
+                                class="link-card"
+                                data-share-url="{{ link.url }}"
+                                data-share-name="{{ link.name }}"
+                            >
+
+
+                                <!-- FILE NUMBER + NAME -->
+
+                                <div class="link-name">
+
+                                    <span class="file-number">
+                                        {{ loop.index }}
+                                    </span>
+
+                                    {{ link.name }}
+
+                                </div>
+
+
+
+                                <!-- EXPIRY -->
+
+                                <div class="expiry-text">
+
+                                    ⏱ Valid for:
+                                    {{ link.validity }}
+
+                                </div>
+
+
+
+                                <!-- S3 LINK -->
+
+                                <div class="link-row">
+
+
+                                    <input
+                                        class="link-input"
+                                        value="{{ link.url }}"
+                                        readonly
+                                    >
+
+
+                                    <button
+                                        class="copy"
+                                        type="button"
+                                        onclick="copyLink(this)"
+                                    >
+                                        Copy
+                                    </button>
+
+
+                                </div>
+
+
+
+                                <!-- =================================================
+                                     SOCIAL SHARE FOR THIS INDIVIDUAL FILE
+                                ================================================= -->
+
+                                <div class="share-options">
+
+
+                                    <div class="share-options-title">
+
+                                        📤 Share
+                                        {{ link.name }}
+                                        via
+
+                                    </div>
+
+
+                                    <div class="share-buttons">
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn native"
+                                            onclick="nativeShare(this)"
+                                        >
+                                            📤 Share
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn whatsapp"
+                                            onclick="shareWhatsApp(this)"
+                                        >
+                                            💬 WhatsApp
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn telegram"
+                                            onclick="shareTelegram(this)"
+                                        >
+                                            ✈️ Telegram
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn email"
+                                            onclick="shareEmail(this)"
+                                        >
+                                            📧 Email
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn sms"
+                                            onclick="shareSMS(this)"
+                                        >
+                                            💬 SMS
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn linkedin"
+                                            onclick="shareLinkedIn(this)"
+                                        >
+                                            💼 LinkedIn
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn facebook"
+                                            onclick="shareFacebook(this)"
+                                        >
+                                            📘 Facebook
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn x"
+                                            onclick="shareX(this)"
+                                        >
+                                            𝕏 X
+                                        </button>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        {% endfor %}
+
+
+                    {% endif %}
+
+
+
+                    <!-- =================================================
+                         COMBINED BULK SHARE LINK
+
+                         ONLY SHOWN IF BACKEND PROVIDES IT.
+                    ================================================= -->
+
+                    {% if bulk_share_url or share_url %}
+
+
+                        <div class="link-card">
+
+
+                            <div class="link-name">
+
+                                📁
+
+                                Share All
+                                {{ files|length }}
+                                Files Together
+
+                            </div>
+
+
+                            <div class="expiry-text">
+
+                                ⏱ Valid for:
+                                {{ minutes or 15 }}
+                                minutes
+
+                            </div>
+
+
+                            <div class="bulk-share-summary">
+
+                                🔗
+
+                                <strong>
+                                    Combined Share Link
+                                </strong>
+
+                                <br>
+
+                                This link can be used to share
+                                all selected files together.
+
+                            </div>
+
+
+                            <div class="link-row">
+
+
+                                <input
+                                    class="link-input"
+                                    value="{% if bulk_share_url %}{{ bulk_share_url }}{% else %}{{ share_url }}{% endif %}"
+                                    readonly
+                                >
+
+
+                                <button
+                                    class="copy"
+                                    type="button"
+                                    onclick="copyLink(this)"
+                                >
+                                    Copy
+                                </button>
+
+
+                            </div>
+
+
+
+                            <!-- =================================================
+                                 BULK SOCIAL SHARE
+                            ================================================= -->
+
+                            <div
+                                id="bulkShareCard"
+                                data-share-url="{% if bulk_share_url %}{{ bulk_share_url }}{% else %}{{ share_url }}{% endif %}"
+                                data-share-name="{{ files|length }} files from CloudStorage"
+                            >
+
+
+                                <div class="share-options">
+
+
+                                    <div class="share-options-title">
+
+                                        📤 Share all selected files via
+
+                                    </div>
+
+
+                                    <div class="share-buttons">
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn native"
+                                            onclick="nativeBulkShare()"
+                                        >
+                                            📤 Share
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn whatsapp"
+                                            onclick="shareBulkWhatsApp()"
+                                        >
+                                            💬 WhatsApp
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn telegram"
+                                            onclick="shareBulkTelegram()"
+                                        >
+                                            ✈️ Telegram
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn email"
+                                            onclick="shareBulkEmail()"
+                                        >
+                                            📧 Email
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn sms"
+                                            onclick="shareBulkSMS()"
+                                        >
+                                            💬 SMS
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn linkedin"
+                                            onclick="shareBulkLinkedIn()"
+                                        >
+                                            💼 LinkedIn
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn facebook"
+                                            onclick="shareBulkFacebook()"
+                                        >
+                                            📘 Facebook
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="share-btn x"
+                                            onclick="shareBulkX()"
+                                        >
+                                            𝕏 X
+                                        </button>
+
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endif %}
+
+
+
+            <!-- =====================================================
+                 FAILED FILES
+            ===================================================== -->
+
+            {% if failed_files %}
+
+
+                <div class="failed">
+
+
+                    <h3>
+                        Some files could not be shared
+                    </h3>
+
+
+                    <ul>
+
+
+                        {% for failed in failed_files %}
+
+                            <li>
+                                {{ failed }}
+                            </li>
+
+                        {% endfor %}
+
+
+                    </ul>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+    </main>
+
+
+
+    <script>
+
+
+        /* =====================================================
+           EXPIRY BUTTONS
+        ===================================================== */
+
+        const buttons =
+            document.querySelectorAll(".expiry button");
+
+        const minutes =
+            document.getElementById("minutes");
+
+        const info =
+            document.getElementById("expiryInfo");
+
+
+        buttons.forEach(button => {
+
+
+            button.addEventListener("click", () => {
+
+
+                buttons.forEach(item => {
+
+                    item.classList.remove("active");
+
+                });
+
+
+                button.classList.add("active");
+
+
+                const value =
+                    button.dataset.minutes;
+
+
+                if (minutes) {
+
+                    minutes.value = value;
+
+                }
+
+
+                const labels = {
+
+                    "15": "15 minutes",
+
+                    "60": "1 hour",
+
+                    "1440": "1 day",
+
+                    "10080": "7 days"
+
+                };
+
+
+                if (info) {
+
+                    info.textContent =
+                        "The S3 presigned URL will expire after " +
+                        labels[value] +
+                        ".";
+
+                }
+
+
+            });
+
+
+        });
+
+
+
+        /* =====================================================
+           FORM SUBMIT
+        ===================================================== */
+
+        const form =
+            document.getElementById("shareForm");
+
+        const submit =
+            document.getElementById("submitBtn");
+
+
+        if (form) {
+
+
+            form.addEventListener("submit", () => {
+
+
+                if (submit) {
+
+
+                    submit.disabled = true;
+
+
+                    submit.textContent =
+                        "⏳ Generating Share...";
+
+
+                }
+
+
+            });
+
+
+        }
+
+
+
+        /* =====================================================
+           GET SINGLE FILE SHARE DATA
+        ===================================================== */
+
+        function getShareData(button) {
+
+
+            const card =
+                button.closest(".link-card");
+
+
+            if (!card) {
+
+
+                return {
+
+                    url: "",
+
+                    name: "CloudStorage File"
+
+                };
+
+
+            }
+
+
+            const url =
+                card.dataset.shareUrl ||
+                card.querySelector(".link-input")?.value ||
+                "";
+
+
+            const name =
+                card.dataset.shareName ||
+                "CloudStorage File";
+
+
+            return {
+
+                url,
+
+                name
+
+            };
+
+
+        }
+
+
+
+        /* =====================================================
+           GET BULK SHARE DATA
+        ===================================================== */
+
+        function getBulkShareData() {
+
+
+            const card =
+                document.getElementById("bulkShareCard");
+
+
+            if (!card) {
+
+
+                return {
+
+                    url: "",
+
+                    name: "CloudStorage Files"
+
+                };
+
+
+            }
+
+
+            return {
+
+
+                url:
+                    card.dataset.shareUrl || "",
+
+
+                name:
+                    card.dataset.shareName ||
+                    "CloudStorage Files"
+
+
+            };
+
+
+        }
+
+
+
+        /* =====================================================
+           COPY LINK
+        ===================================================== */
+
+        function copyLink(button) {
+
+
+            const input =
+                button.parentElement
+                    .querySelector(".link-input");
+
+
+            if (!input) {
+
+                return;
+
+            }
+
+
+            const done = () => {
+
+
+                const oldText =
+                    button.textContent;
+
+
+                button.textContent =
+                    "✓ Copied";
+
+
+                setTimeout(() => {
+
+
+                    button.textContent =
+                        oldText;
+
+
+                }, 1500);
+
+
+            };
+
+
+            if (
+                navigator.clipboard &&
+                window.isSecureContext
+            ) {
+
+
+                navigator.clipboard
+                    .writeText(input.value)
+                    .then(done)
+                    .catch(() =>
+                        fallback(input, done)
+                    );
+
+
+            } else {
+
+
+                fallback(input, done);
+
+
+            }
+
+
+        }
+
+
+
+        /* =====================================================
+           COPY FALLBACK
+        ===================================================== */
+
+        function fallback(input, done) {
+
+
+            input.focus();
+
+            input.select();
+
+
+            try {
+
+
+                if (
+                    document.execCommand("copy")
+                ) {
+
+
+                    done();
+
+
+                } else {
+
+
+                    alert(
+                        "Please copy the link manually."
+                    );
+
+
+                }
+
+
+            } catch (error) {
+
+
+                alert(
+                    "Please copy the link manually."
+                );
+
+
+            }
+
+
+        }
+
+
+
+        /* =====================================================
+           SINGLE / INDIVIDUAL FILE NATIVE SHARE
+        ===================================================== */
+
+        async function nativeShare(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            if (navigator.share) {
+
+
+                try {
+
+
+                    await navigator.share({
+
+
+                        title:
+                            "Share " +
+                            data.name,
+
+
+                        text:
+                            "Shared from CloudStorage",
+
+
+                        url:
+                            data.url
+
+
+                    });
+
+
+                } catch (error) {
+
+
+                    if (
+                        error.name !==
+                        "AbortError"
+                    ) {
+
+
+                        copyText(data.url);
+
+
+                    }
+
+
+                }
+
+
+            } else {
+
+
+                copyText(data.url);
+
+
+                alert(
+                    "Native sharing is not supported " +
+                    "on this browser. The S3 link " +
+                    "has been copied."
+                );
+
+
+            }
+
+
+        }
+
+
+
+        /* =====================================================
+           WHATSAPP
+        ===================================================== */
+
+        function shareWhatsApp(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const text =
+                "📁 " +
+                data.name +
+                "\n\n" +
+                "Download / view file:\n" +
+                data.url;
+
+
+            const url =
+                "https://wa.me/?text=" +
+                encodeURIComponent(text);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           TELEGRAM
+        ===================================================== */
+
+        function shareTelegram(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const url =
+                "https://t.me/share/url?url=" +
+                encodeURIComponent(data.url) +
+                "&text=" +
+                encodeURIComponent(
+                    "📁 " + data.name
+                );
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           EMAIL
+        ===================================================== */
+
+        function shareEmail(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const subject =
+                "Shared file - " +
+                data.name;
+
+
+            const body =
+                "Hello,\n\n" +
+                "I am sharing this file with you:\n\n" +
+                data.name +
+                "\n\n" +
+                data.url +
+                "\n\n" +
+                "This Amazon S3 link is temporary.\n\n" +
+                "Shared using CloudStorage.";
+
+
+            window.location.href =
+                "mailto:?subject=" +
+                encodeURIComponent(subject) +
+                "&body=" +
+                encodeURIComponent(body);
+
+
+        }
+
+
+
+        /* =====================================================
+           SMS
+        ===================================================== */
+
+        function shareSMS(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const body =
+                "📁 " +
+                data.name +
+                "\n\n" +
+                data.url;
+
+
+            window.location.href =
+                "sms:?body=" +
+                encodeURIComponent(body);
+
+
+        }
+
+
+
+        /* =====================================================
+           LINKEDIN
+        ===================================================== */
+
+        function shareLinkedIn(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const url =
+                "https://www.linkedin.com/sharing/share-offsite/?url=" +
+                encodeURIComponent(data.url);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           FACEBOOK
+        ===================================================== */
+
+        function shareFacebook(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const url =
+                "https://www.facebook.com/sharer/sharer.php?u=" +
+                encodeURIComponent(data.url);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           X
+        ===================================================== */
+
+        function shareX(button) {
+
+
+            const data =
+                getShareData(button);
+
+
+            if (!data.url) {
+
+                return;
+
+            }
+
+
+            const text =
+                "📁 " +
+                data.name +
+                " - Shared from CloudStorage";
+
+
+            const url =
+                "https://twitter.com/intent/tweet?text=" +
+                encodeURIComponent(text) +
+                "&url=" +
+                encodeURIComponent(data.url);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK NATIVE SHARE
+        ===================================================== */
+
+        async function nativeBulkShare() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            if (navigator.share) {
+
+
+                try {
+
+
+                    await navigator.share({
+
+
+                        title:
+                            "Share selected files",
+
+
+                        text:
+                            "📁 " +
+                            data.name +
+                            "\n\n" +
+                            "Shared from CloudStorage",
+
+
+                        url:
+                            data.url
+
+
+                    });
+
+
+                } catch (error) {
+
+
+                    if (
+                        error.name !==
+                        "AbortError"
+                    ) {
+
+
+                        copyText(data.url);
+
+
+                    }
+
+
+                }
+
+
+            } else {
+
+
+                copyText(data.url);
+
+
+                alert(
+                    "Native sharing is not supported " +
+                    "on this browser. The share URL " +
+                    "has been copied."
+                );
+
+
+            }
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK WHATSAPP
+        ===================================================== */
+
+        function shareBulkWhatsApp() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const text =
+                "📁 " +
+                data.name +
+                "\n\n" +
+                "I am sharing these files with you:\n" +
+                data.url +
+                "\n\n" +
+                "Shared from CloudStorage.";
+
+
+            const url =
+                "https://wa.me/?text=" +
+                encodeURIComponent(text);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK TELEGRAM
+        ===================================================== */
+
+        function shareBulkTelegram() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const url =
+                "https://t.me/share/url?url=" +
+                encodeURIComponent(data.url) +
+                "&text=" +
+                encodeURIComponent(
+                    "📁 " +
+                    data.name +
+                    " - Shared from CloudStorage"
+                );
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK EMAIL
+        ===================================================== */
+
+        function shareBulkEmail() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const subject =
+                "Shared files - CloudStorage";
+
+
+            const body =
+                "Hello,\n\n" +
+                "I am sharing " +
+                data.name +
+                " with you.\n\n" +
+                "Open the shared files here:\n\n" +
+                data.url +
+                "\n\n" +
+                "This share link is temporary.\n\n" +
+                "Shared using CloudStorage.";
+
+
+            window.location.href =
+                "mailto:?subject=" +
+                encodeURIComponent(subject) +
+                "&body=" +
+                encodeURIComponent(body);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK SMS
+        ===================================================== */
+
+        function shareBulkSMS() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const body =
+                "📁 " +
+                data.name +
+                "\n\n" +
+                "Shared files:\n" +
+                data.url;
+
+
+            window.location.href =
+                "sms:?body=" +
+                encodeURIComponent(body);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK LINKEDIN
+        ===================================================== */
+
+        function shareBulkLinkedIn() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const url =
+                "https://www.linkedin.com/sharing/share-offsite/?url=" +
+                encodeURIComponent(data.url);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK FACEBOOK
+        ===================================================== */
+
+        function shareBulkFacebook() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const url =
+                "https://www.facebook.com/sharer/sharer.php?u=" +
+                encodeURIComponent(data.url);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           BULK X
+        ===================================================== */
+
+        function shareBulkX() {
+
+
+            const data =
+                getBulkShareData();
+
+
+            if (!data.url) {
+
+
+                alert(
+                    "No share URL is available for the selected files."
+                );
+
+
+                return;
+
+            }
+
+
+            const text =
+                "📁 " +
+                data.name +
+                " - Shared from CloudStorage";
+
+
+            const url =
+                "https://twitter.com/intent/tweet?text=" +
+                encodeURIComponent(text) +
+                "&url=" +
+                encodeURIComponent(data.url);
+
+
+            openShareWindow(url);
+
+
+        }
+
+
+
+        /* =====================================================
+           OPEN SHARE WINDOW
+        ===================================================== */
+
+        function openShareWindow(url) {
+
+
+            window.open(
+                url,
+                "_blank",
+                "noopener,noreferrer,width=700,height=650"
+            );
+
+
+        }
+
+
+
+        /* =====================================================
+           COPY TEXT
+        ===================================================== */
+
+        function copyText(text) {
+
+
+            if (
+                navigator.clipboard &&
+                window.isSecureContext
+            ) {
+
+
+                navigator.clipboard
+                    .writeText(text)
+                    .then(() => {
+
+
+                        alert(
+                            "Share link copied successfully."
+                        );
+
+
+                    });
+
+
+            } else {
+
+
+                const temp =
+                    document.createElement("textarea");
+
+
+                temp.value = text;
+
+
+                document.body.appendChild(temp);
+
+
+                temp.select();
+
+
+                try {
+
+
+                    document.execCommand("copy");
+
+
+                    alert(
+                        "Share link copied successfully."
+                    );
+
+
+                } finally {
+
+
+                    temp.remove();
+
+
+                }
+
+
+            }
+
+
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>

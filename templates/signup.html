@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CloudStorage - Sign Up</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f8fd;
+        }
+
+        .navbar {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6%;
+            border-bottom: 1px solid #e5eaf1;
+        }
+
+        .logo {
+            color: #1267e8;
+            font-size: 21px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .home {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .container {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .card {
+            width: 420px;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 12px 35px rgba(30,60,100,.1);
+        }
+
+        .logo-center {
+            text-align: center;
+            color: #1267e8;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 16px;
+            border: 1px solid #d7e0eb;
+            border-radius: 7px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #1267e8;
+            border: none;
+            color: white;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .login {
+            text-align: center;
+            color: #718096;
+            margin-top: 20px;
+        }
+
+        .login a {
+            color: #1267e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header class="navbar">
+
+    <a href="/" class="logo">
+        ☁ CloudStorage
+    </a>
+
+    <a href="/" class="home">
+        Home
+    </a>
+
+</header>
+
+
+<div class="container">
+
+    <form
+        method="POST"
+        class="card"
+    >
+
+        <div class="logo-center">
+            ☁ CloudStorage
+        </div>
+
+        <h1>
+            Create Account
+        </h1>
+
+        <p class="subtitle">
+            Start storing your files securely
+            in the cloud.
+        </p>
+
+
+        <label>
+            Full Name
+        </label>
+
+        <input
+            type="text"
+            name="name"
+            placeholder="Enter your name"
+            required
+        >
+
+
+        <label>
+            Email Address
+        </label>
+
+        <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            required
+        >
+
+
+        <label>
+            Password
+        </label>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Minimum 6 characters"
+            required
+        >
+
+
+        <button type="submit">
+            Create Account
+        </button>
+
+
+        <div class="login">
+
+            Already have an account?
+
+            <a href="/login">
+                Login
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+</body>
+</html>

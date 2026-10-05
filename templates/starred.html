@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+    name="color-scheme"
+    content="light"
+>
+
+<title>Starred - CloudStorage</title>
+
+
+<style>
+
+/* =================================================
+   GLOBAL
+================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    background: #f5f7fb;
+    color: #172033;
+    overflow-x: hidden;
+}
+
+
+/* =================================================
+   NAVBAR
+================================================= */
+
+.navbar {
+    min-height: 70px;
+    width: 100%;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 30px;
+}
+
+.logo {
+    color: #2563eb;
+    font-size: 23px;
+    font-weight: bold;
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-name {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.logout {
+    background: #ef4444;
+    color: white;
+    text-decoration: none;
+
+    padding: 9px 16px;
+    border-radius: 7px;
+
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.logout:hover {
+    background: #dc2626;
+}
+
+
+/* =================================================
+   LAYOUT
+================================================= */
+
+.layout {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 70px);
+}
+
+
+/* =================================================
+   SIDEBAR
+================================================= */
+
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+
+    background: white;
+    border-right: 1px solid #e5e7eb;
+
+    padding: 25px 15px;
+}
+
+.sidebar-title {
+    font-size: 12px;
+    color: #9ca3af;
+
+    margin: 0 12px 12px;
+
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 12px 14px;
+    margin-bottom: 5px;
+
+    text-decoration: none;
+    color: #374151;
+
+    border-radius: 9px;
+
+    transition: 0.2s;
+}
+
+.sidebar-item:hover {
+    background: #f1f5f9;
+    color: #2563eb;
+}
+
+.sidebar-item.active {
+    background: #eaf2ff;
+    color: #2563eb;
+    font-weight: bold;
+}
+
+.sidebar-icon {
+    width: 25px;
+    text-align: center;
+    font-size: 18px;
+}
+
+
+/* =================================================
+   CONTENT
+================================================= */
+
+.content {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+
+    padding: 35px;
+}
+
+.header {
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 28px;
+}
+
+.header p {
+    color: #6b7280;
+    margin-top: 7px;
+    font-size: 14px;
+}
+
+
+/* =================================================
+   FILE LIST
+   ONE FILE PER ROW
+================================================= */
+
+.file-grid {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 9px;
+
+    padding: 0;
+}
+
+
+/* =================================================
+   COMPACT FILE CARD
+================================================= */
+
+.file-card {
+    width: 100%;
+    min-width: 0;
+    min-height: 78px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    padding: 9px 12px;
+
+    display: grid;
+
+    grid-template-columns:
+        58px
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    gap: 12px;
+
+    position: relative;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.file-card:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 16px
+        rgba(0, 0, 0, 0.06);
+}
+
+
+/* =================================================
+   STARRED BADGE
+================================================= */
+
+.starred-badge {
+    position: absolute;
+
+    top: 7px;
+    right: 10px;
+
+    z-index: 5;
+
+    background: #fef3c7;
+    color: #92400e;
+
+    font-size: 9px;
+    font-weight: bold;
+
+    padding: 3px 6px;
+
+    border-radius: 12px;
+
+    line-height: 1.2;
+}
+
+
+/* =================================================
+   FILE ICON
+================================================= */
+
+.file-icon {
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    margin: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+
+/* =================================================
+   IMAGE THUMBNAIL
+================================================= */
+
+.file-thumbnail {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    border-radius: 7px;
+
+    background: #f8fafc;
+
+    transition:
+        transform 0.2s ease;
+}
+
+.file-thumbnail:hover {
+    transform: scale(1.03);
+}
+
+
+/* =================================================
+   ICON PLACEHOLDER
+================================================= */
+
+.file-icon-placeholder {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 29px;
+}
+
+
+/* =================================================
+   FILE DETAILS
+================================================= */
+
+.file-details {
+    min-width: 0;
+    overflow: hidden;
+
+    padding-right: 80px;
+}
+
+
+/* =================================================
+   FILE TYPE
+================================================= */
+
+.item-type {
+    display: inline-block;
+
+    font-size: 9px;
+    font-weight: bold;
+
+    padding: 3px 7px;
+
+    border-radius: 4px;
+
+    margin-bottom: 3px;
+
+    line-height: 1.2;
+
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+
+/* =================================================
+   FILE NAME
+================================================= */
+
+.file-name {
+    font-weight: bold;
+
+    font-size: 14px;
+
+    line-height: 1.35;
+
+    margin-bottom: 3px;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =================================================
+   FILE INFORMATION
+================================================= */
+
+.file-info {
+    color: #6b7280;
+
+    font-size: 11px;
+
+    line-height: 1.35;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.file-info strong {
+    color: #374151;
+}
+
+
+/* =================================================
+   ACTIONS
+================================================= */
+
+.actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 6px;
+
+    flex-shrink: 0;
+
+    padding-top: 15px;
+}
+
+
+/* =================================================
+   BUTTON
+================================================= */
+
+.btn {
+    border: none;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    padding: 7px 10px;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+
+    transition: 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* =================================================
+   VIEW
+================================================= */
+
+.view {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.view:hover {
+    background: #bae6fd;
+}
+
+
+/* =================================================
+   DOWNLOAD
+================================================= */
+
+.download {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.download:hover {
+    background: #bbf7d0;
+}
+
+
+/* =================================================
+   UNSTAR
+================================================= */
+
+.unstar {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.unstar:hover {
+    background: #fde68a;
+}
+
+
+/* =================================================
+   DELETE
+================================================= */
+
+.delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.delete:hover {
+    background: #fecaca;
+}
+
+
+/* =================================================
+   EMPTY STATE
+================================================= */
+
+.empty {
+    background: white;
+
+    border: 1px dashed #cbd5e1;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    padding: 70px 20px;
+
+    color: #64748b;
+}
+
+.empty-icon {
+    font-size: 55px;
+    margin-bottom: 15px;
+}
+
+.empty h2 {
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.empty p {
+    font-size: 14px;
+}
+
+
+/* =================================================
+   RESPONSIVE - TABLET
+================================================= */
+
+@media (max-width: 1000px) {
+
+    .content {
+        padding: 25px;
+    }
+
+    .file-card {
+        grid-template-columns:
+            58px
+            minmax(0, 1fr)
+            auto;
+
+        gap: 9px;
+    }
+
+    .actions {
+        flex-wrap: wrap;
+        max-width: 190px;
+    }
+
+}
+
+
+/* =================================================
+   RESPONSIVE - MOBILE
+================================================= */
+
+@media (max-width: 750px) {
+
+    .navbar {
+        min-height: 64px;
+        padding: 0 18px;
+    }
+
+    .logo {
+        font-size: 19px;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .logout {
+        padding: 8px 13px;
+        font-size: 12px;
+    }
+
+
+    .layout {
+        flex-direction: column;
+        min-height: calc(100vh - 64px);
+    }
+
+
+    /* MOBILE SIDEBAR */
+
+    .sidebar {
+        width: 100%;
+
+        display: flex;
+
+        overflow-x: auto;
+
+        padding: 10px;
+
+        border-right: none;
+
+        border-bottom: 1px solid #e5e7eb;
+
+        scrollbar-width: none;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar-title {
+        display: none;
+    }
+
+    .sidebar-item {
+        white-space: nowrap;
+
+        margin: 0 3px;
+
+        flex-shrink: 0;
+
+        padding: 10px 12px;
+    }
+
+
+    /* CONTENT */
+
+    .content {
+        width: 100%;
+        padding: 18px 14px;
+    }
+
+    .header {
+        margin-bottom: 18px;
+    }
+
+    .header h1 {
+        font-size: 23px;
+    }
+
+    .header p {
+        font-size: 12px;
+    }
+
+
+    /* KEEP ONE FILE PER ROW */
+
+    .file-grid {
+        display: flex;
+        flex-direction: column;
+
+        gap: 8px;
+
+        width: 100%;
+    }
+
+
+    .file-card {
+        width: 100%;
+
+        min-height: 68px;
+
+        padding: 7px 8px;
+
+        grid-template-columns:
+            50px
+            minmax(0, 1fr);
+
+        gap: 9px;
+    }
+
+
+    .file-icon {
+        width: 50px;
+        height: 50px;
+    }
+
+
+    .file-icon-placeholder {
+        font-size: 25px;
+    }
+
+
+    .file-details {
+        padding-right: 60px;
+    }
+
+
+    .file-name {
+        font-size: 13px;
+    }
+
+
+    .file-info {
+        font-size: 10px;
+    }
+
+
+    /* ACTIONS BELOW DETAILS */
+
+    .actions {
+        grid-column: 2;
+
+        width: 100%;
+
+        justify-content: flex-start;
+
+        max-width: none;
+
+        flex-wrap: wrap;
+
+        gap: 5px;
+
+        padding-top: 0;
+
+        margin-top: 1px;
+    }
+
+
+    .btn {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+
+    .starred-badge {
+        top: 5px;
+        right: 7px;
+
+        font-size: 8px;
+
+        padding: 3px 5px;
+    }
+
+}
+
+
+/* =================================================
+   SMALL MOBILE
+================================================= */
+
+@media (max-width: 420px) {
+
+    .navbar {
+        padding: 0 12px;
+    }
+
+    .logo {
+        font-size: 17px;
+    }
+
+    .content {
+        padding: 16px 10px;
+    }
+
+    .header h1 {
+        font-size: 21px;
+    }
+
+
+    .file-card {
+        grid-template-columns:
+            46px
+            minmax(0, 1fr);
+
+        padding: 6px;
+
+        gap: 8px;
+    }
+
+
+    .file-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+
+    .file-icon-placeholder {
+        font-size: 23px;
+    }
+
+
+    .file-details {
+        padding-right: 48px;
+    }
+
+
+    .file-name {
+        font-size: 12px;
+    }
+
+
+    .file-info {
+        font-size: 9px;
+    }
+
+
+    .actions {
+        grid-column: 2;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        width: 100%;
+
+        gap: 5px;
+    }
+
+
+    .btn {
+        width: 100%;
+
+        padding: 6px 5px;
+
+        font-size: 9px;
+    }
+
+}
+
+
+/* =================================================
+   VERY SMALL SCREENS
+================================================= */
+
+@media (max-width: 330px) {
+
+    .sidebar-item {
+        padding: 9px 10px;
+        font-size: 12px;
+    }
+
+    .sidebar-icon {
+        font-size: 15px;
+        width: 20px;
+    }
+
+    .file-card {
+        grid-template-columns:
+            42px
+            minmax(0, 1fr);
+
+        gap: 7px;
+    }
+
+    .file-icon {
+        width: 42px;
+        height: 42px;
+    }
+
+    .file-name {
+        font-size: 11px;
+    }
+
+    .file-info {
+        font-size: 8px;
+    }
+
+    .btn {
+        font-size: 8px;
+        padding: 5px 4px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+====================================================== -->
+
+<nav class="navbar">
+
+
+    <div class="logo">
+
+        ☁️ CloudStorage
+
+    </div>
+
+
+    <div class="user-area">
+
+
+        <span class="user-name">
+
+            👤
+
+            {{ session.get(
+                'user_name',
+                session.get(
+                    'name',
+                    session.get(
+                        'username',
+                        'User'
+                    )
+                )
+            ) }}
+
+        </span>
+
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="logout"
+        >
+
+            Logout
+
+        </a>
+
+
+    </div>
+
+
+</nav>
+
+
+
+<!-- =====================================================
+     MAIN LAYOUT
+====================================================== -->
+
+<div class="layout">
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================= -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-title">
+
+            Storage
+
+        </div>
+
+
+        <!-- MY FILES -->
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="sidebar-item"
+        >
+
+            <span class="sidebar-icon">
+
+                📁
+
+            </span>
+
+            My Files
+
+        </a>
+
+
+        <!-- RECENT -->
+
+        <a
+            href="{{ url_for('recent_files') }}"
+            class="sidebar-item"
+        >
+
+            <span class="sidebar-icon">
+
+                🕐
+
+            </span>
+
+            Recent
+
+        </a>
+
+
+        <!-- STARRED -->
+
+        <a
+            href="{{ url_for('starred_files') }}"
+            class="sidebar-item active"
+        >
+
+            <span class="sidebar-icon">
+
+                ⭐
+
+            </span>
+
+            Starred
+
+        </a>
+
+
+        <!-- TRASH -->
+
+        <a
+            href="{{ url_for('trash') }}"
+            class="sidebar-item"
+        >
+
+            <span class="sidebar-icon">
+
+                🗑
+
+            </span>
+
+            Trash
+
+        </a>
+
+
+    </aside>
+
+
+
+    <!-- =================================================
+         CONTENT
+    ================================================= -->
+
+    <main class="content">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="header">
+
+            <h1>
+
+                ⭐ Starred Files
+
+            </h1>
+
+
+            <p>
+
+                Your important files are saved here
+
+            </p>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FILES EXIST
+        ================================================= -->
+
+        {% if files %}
+
+
+            <div class="file-grid">
+
+
+                {% for file in files %}
+
+
+                    <div class="file-card">
+
+
+                        <!-- =================================================
+                             STARRED BADGE
+                        ================================================= -->
+
+                        <div class="starred-badge">
+
+                            ⭐ Starred
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             FILE ICON / IMAGE THUMBNAIL
+                        ================================================= -->
+
+                        <div class="file-icon">
+
+
+                            {% set filename =
+                                file['name'].lower()
+                            %}
+
+
+                            {% if filename.endswith(
+                                (
+                                    '.jpg',
+                                    '.jpeg',
+                                    '.png',
+                                    '.gif',
+                                    '.webp',
+                                    '.svg',
+                                    '.bmp',
+                                    '.ico',
+                                    '.avif'
+                                )
+                            ) %}
+
+
+                                <!-- ACTUAL IMAGE -->
+
+                                <img
+                                    src="{{ url_for(
+                                        'file_preview',
+                                        key=file['key']
+                                    ) }}"
+                                    alt="{{ file['name'] }}"
+                                    class="file-thumbnail"
+                                    loading="lazy"
+                                    onerror="
+                                        this.style.display='none';
+                                        this.nextElementSibling.style.display='flex';
+                                    "
+                                >
+
+
+                                <!-- IMAGE FALLBACK -->
+
+                                <span
+                                    class="file-icon-placeholder"
+                                    style="display:none;"
+                                >
+
+                                    🖼️
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.mp4',
+                                    '.mkv',
+                                    '.avi',
+                                    '.mov',
+                                    '.webm'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    🎬
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.mp3',
+                                    '.wav',
+                                    '.aac',
+                                    '.ogg'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    🎵
+
+                                </span>
+
+
+                            {% elif filename.endswith('.pdf') %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    📕
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.doc',
+                                    '.docx'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    📘
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.xls',
+                                    '.xlsx',
+                                    '.csv'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    📊
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.ppt',
+                                    '.pptx'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    📙
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.zip',
+                                    '.rar',
+                                    '.7z'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    🗜️
+
+                                </span>
+
+
+                            {% elif filename.endswith('.txt') %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    📝
+
+                                </span>
+
+
+                            {% elif filename.endswith(
+                                (
+                                    '.py',
+                                    '.java',
+                                    '.cpp',
+                                    '.c',
+                                    '.js',
+                                    '.html',
+                                    '.css'
+                                )
+                            ) %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    💻
+
+                                </span>
+
+
+                            {% else %}
+
+
+                                <span class="file-icon-placeholder">
+
+                                    ⭐
+
+                                </span>
+
+
+                            {% endif %}
+
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             FILE DETAILS
+                        ================================================= -->
+
+                        <div class="file-details">
+
+
+                            <!-- FILE TYPE -->
+
+                            <div class="item-type">
+
+                                FILE
+
+                            </div>
+
+
+                            <!-- FILE NAME -->
+
+                            <div
+                                class="file-name"
+                                title="{{ file['name'] }}"
+                            >
+
+                                {{ file['name'] }}
+
+                            </div>
+
+
+                            <!-- FILE INFORMATION -->
+
+                            <div class="file-info">
+
+
+                                {% if file['size'] is not none %}
+
+                                    <strong>Size:</strong>
+
+                                    {{ file['size'] }}
+
+                                    bytes
+
+                                {% endif %}
+
+
+                                {% if file['created_at'] %}
+
+                                    &nbsp; • &nbsp;
+
+                                    <strong>Added:</strong>
+
+                                    {{ file['created_at'] }}
+
+                                {% endif %}
+
+
+                                {% if file['last_accessed'] %}
+
+                                    &nbsp; • &nbsp;
+
+                                    <strong>Last accessed:</strong>
+
+                                    {{ file['last_accessed'] }}
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <!-- =================================================
+                             ACTIONS
+                        ================================================= -->
+
+                        <div class="actions">
+
+
+                            <!-- VIEW -->
+
+                            <a
+                                href="{{ url_for(
+                                    'preview',
+                                    key=file['key']
+                                ) }}"
+                                class="btn view"
+                                title="Preview file"
+                            >
+
+                                👁 View
+
+                            </a>
+
+
+
+                            <!-- DOWNLOAD -->
+
+                            <a
+                                href="{{ url_for(
+                                    'download',
+                                    key=file['key']
+                                ) }}"
+                                class="btn download"
+                                title="Download file"
+                            >
+
+                                ⬇ Download
+
+                            </a>
+
+
+
+                            <!-- REMOVE STAR -->
+
+                            <a
+                                href="{{ url_for(
+                                    'unstar_file',
+                                    file_id=file['id']
+                                ) }}"
+                                class="btn unstar"
+                                title="Remove from starred"
+                            >
+
+                                ☆ Remove Star
+
+                            </a>
+
+
+
+                            <!-- MOVE TO TRASH -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'delete_file',
+                                    key=file['key']
+                                ) }}"
+                                style="display:inline;"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn delete"
+                                    title="Move file to Trash"
+                                    onclick="return confirm(
+                                        'Move this file to Trash?'
+                                    );"
+                                >
+
+                                    🗑 Trash
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- =================================================
+                 EMPTY STATE
+            ================================================= -->
+
+            <div class="empty">
+
+
+                <div class="empty-icon">
+
+                    ⭐
+
+                </div>
+
+
+                <h2>
+
+                    No starred files
+
+                </h2>
+
+
+                <p>
+
+                    Star your important files to find them quickly.
+
+                </p>
+
+
+            </div>
+
+
+        {% endif %}
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>

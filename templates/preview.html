@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="color-scheme"
+        content="dark"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0b1120"
+    >
+
+    <title>CloudStorage - Preview</title>
+
+
+    <!-- =====================================================
+         JSZip Library
+         Used for ZIP file preview
+    ====================================================== -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+        defer
+    ></script>
+
+
+    <style>
+
+        /* =====================================================
+           GLOBAL
+        ====================================================== */
+
+        :root {
+
+            --bg-primary: #080d18;
+            --bg-secondary: #0d1422;
+            --bg-card: rgba(17, 25, 39, 0.82);
+            --bg-card-solid: #111927;
+
+            --border: rgba(148, 163, 184, 0.14);
+            --border-hover: rgba(96, 165, 250, 0.35);
+
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --blue-light: #60a5fa;
+
+            --green: #22c55e;
+            --red: #ef4444;
+
+            --shadow:
+                0 25px 70px rgba(0, 0, 0, 0.38);
+
+            --radius: 18px;
+
+        }
+
+
+        * {
+
+            box-sizing: border-box;
+
+            margin: 0;
+
+            padding: 0;
+
+            font-family:
+                Inter,
+                Arial,
+                Helvetica,
+                sans-serif;
+
+        }
+
+
+        html {
+
+            min-height: 100%;
+
+            background: var(--bg-primary);
+
+        }
+
+
+        body {
+
+            min-height: 100vh;
+
+            background:
+                radial-gradient(
+                    circle at 15% 10%,
+                    rgba(59, 130, 246, 0.10),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 85% 85%,
+                    rgba(37, 99, 235, 0.08),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #080d18,
+                    #0b1220 50%,
+                    #080d18
+                );
+
+            color: var(--text-primary);
+
+        }
+
+
+        /* =====================================================
+           HEADER
+        ====================================================== */
+
+        .header {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+
+            min-height: 72px;
+
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+
+            padding:
+                12px
+                clamp(16px, 4vw, 55px);
+
+            background:
+                rgba(8, 13, 24, 0.86);
+
+            backdrop-filter: blur(18px);
+
+            -webkit-backdrop-filter: blur(18px);
+
+            border-bottom:
+                1px solid var(--border);
+
+        }
+
+
+        /* =====================================================
+           BACK BUTTON
+        ====================================================== */
+
+        .back {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            min-height: 42px;
+
+            padding: 0 15px;
+
+            color: var(--text-primary);
+
+            text-decoration: none;
+
+            background:
+                rgba(255, 255, 255, 0.045);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 11px;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+
+            transition:
+                background 0.2s ease,
+                border 0.2s ease,
+                transform 0.2s ease;
+
+        }
+
+
+        .back:hover {
+
+            background:
+                rgba(59, 130, 246, 0.12);
+
+            border-color:
+                var(--border-hover);
+
+            transform:
+                translateX(-2px);
+
+        }
+
+
+        /* =====================================================
+           FILE HEADER INFORMATION
+        ====================================================== */
+
+        .file-header-info {
+
+            min-width: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        .file-header-icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(59, 130, 246, 0.18),
+                    rgba(37, 99, 235, 0.06)
+                );
+
+            border:
+                1px solid rgba(96, 165, 250, 0.18);
+
+            font-size: 21px;
+
+        }
+
+
+        .filename-wrapper {
+
+            min-width: 0;
+
+        }
+
+
+        .filename-label {
+
+            display: block;
+
+            margin-bottom: 3px;
+
+            color: var(--text-muted);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.12em;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .filename {
+
+            display: block;
+
+            max-width:
+                min(650px, 58vw);
+
+            overflow: hidden;
+
+            color: var(--text-primary);
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* =====================================================
+           MAIN PREVIEW AREA
+        ====================================================== */
+
+        .preview {
+
+            width: 100%;
+
+            min-height:
+                calc(100vh - 72px);
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding:
+                clamp(18px, 3vw, 38px);
+
+        }
+
+
+        .preview-card {
+
+            width: 100%;
+
+            max-width: 1500px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+
+        /* =====================================================
+           IMAGE PREVIEW
+        ====================================================== */
+
+        .image-wrapper {
+
+            position: relative;
+
+            max-width: 96%;
+
+            max-height: 84vh;
+
+            min-width: 120px;
+
+            min-height: 120px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 8px;
+
+            background:
+                rgba(255, 255, 255, 0.035);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow: var(--shadow);
+
+            overflow: hidden;
+
+        }
+
+
+        .image {
+
+            display: block;
+
+            max-width: 100%;
+
+            max-height: 82vh;
+
+            width: auto;
+
+            height: auto;
+
+            object-fit: contain;
+
+            border-radius: 13px;
+
+            opacity: 0;
+
+            transition:
+                opacity 0.25s ease,
+                transform 0.25s ease;
+
+        }
+
+
+        .image.loaded {
+
+            opacity: 1;
+
+        }
+
+
+        .image:hover {
+
+            transform:
+                scale(1.005);
+
+        }
+
+
+        /* =====================================================
+           IMAGE LOADING
+        ====================================================== */
+
+        .image-loading {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            flex-direction: column;
+
+            gap: 12px;
+
+            color: var(--text-secondary);
+
+            font-size: 13px;
+
+            z-index: 1;
+
+            pointer-events: none;
+
+        }
+
+
+        .image-spinner {
+
+            width: 30px;
+
+            height: 30px;
+
+            border:
+                3px solid
+                rgba(148, 163, 184, 0.18);
+
+            border-top-color:
+                var(--blue);
+
+            border-radius: 50%;
+
+            animation:
+                spin 0.8s linear infinite;
+
+        }
+
+
+        .image-error {
+
+            display: none;
+
+            width: min(500px, 90vw);
+
+            padding: 35px 25px;
+
+            text-align: center;
+
+            color: var(--text-secondary);
+
+        }
+
+
+        .image-error-icon {
+
+            font-size: 50px;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .image-error h2 {
+
+            margin-bottom: 10px;
+
+            color: var(--text-primary);
+
+            font-size: 19px;
+
+        }
+
+
+        .image-error p {
+
+            line-height: 1.6;
+
+            font-size: 13px;
+
+        }
+
+
+        /* =====================================================
+           PDF / OFFICE PREVIEW
+        ====================================================== */
+
+        .document-wrapper {
+
+            width: 100%;
+
+            max-width: 1400px;
+
+            height: 84vh;
+
+            padding: 8px;
+
+            background:
+                rgba(255, 255, 255, 0.035);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .pdf-frame,
+        .office-frame {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background: white;
+
+        }
+
+
+        /* =====================================================
+           VIDEO PREVIEW
+        ====================================================== */
+
+        .media-wrapper {
+
+            width: min(1100px, 96%);
+
+            padding: 8px;
+
+            background:
+                rgba(255, 255, 255, 0.035);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .video {
+
+            display: block;
+
+            width: 100%;
+
+            max-height: 78vh;
+
+            background: #000;
+
+            border-radius: 14px;
+
+        }
+
+
+        /* =====================================================
+           AUDIO PREVIEW
+        ====================================================== */
+
+        .audio-container {
+
+            width: min(650px, 96%);
+
+            padding: 45px 35px;
+
+            text-align: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(17, 25, 39, 0.96),
+                    rgba(12, 19, 32, 0.92)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 22px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .audio-icon {
+
+            width: 90px;
+
+            height: 90px;
+
+            margin:
+                0 auto 22px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue-dark)
+                );
+
+            box-shadow:
+                0 15px 40px
+                rgba(37, 99, 235, 0.32);
+
+            font-size: 38px;
+
+        }
+
+
+        .audio-container h2 {
+
+            max-width: 100%;
+
+            margin-bottom: 25px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+            font-size: 20px;
+
+        }
+
+
+        audio {
+
+            width: 100%;
+
+        }
+
+
+        /* =====================================================
+           TEXT / CODE
+        ====================================================== */
+
+        .text-container {
+
+            width: min(1300px, 96%);
+
+            height: 84vh;
+
+            overflow: auto;
+
+            background:
+                #090e17;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .text-toolbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 2;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 13px 18px;
+
+            background:
+                rgba(13, 20, 34, 0.94);
+
+            backdrop-filter: blur(10px);
+
+            border-bottom:
+                1px solid var(--border);
+
+        }
+
+
+        .window-dot {
+
+            width: 9px;
+
+            height: 9px;
+
+            border-radius: 50%;
+
+            background: #475569;
+
+        }
+
+
+        .code-label {
+
+            margin-left: 4px;
+
+            color: var(--text-secondary);
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+        }
+
+
+        .text-content {
+
+            margin: 0;
+
+            padding: 24px;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+
+            font-family:
+                Consolas,
+                Monaco,
+                "Courier New",
+                monospace;
+
+            font-size: 14px;
+
+            line-height: 1.75;
+
+            color: #dbeafe;
+
+        }
+
+
+        /* =====================================================
+           CSV PREVIEW
+        ====================================================== */
+
+        .csv-container {
+
+            width: min(1400px, 96%);
+
+            height: 84vh;
+
+            overflow: auto;
+
+            background: #ffffff;
+
+            color: #111827;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .csv-container table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            font-size: 13px;
+
+        }
+
+
+        .csv-container th {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 3;
+
+            padding:
+                14px 15px;
+
+            background:
+                #1d4ed8;
+
+            color: white;
+
+            font-weight: 700;
+
+            text-align: left;
+
+            white-space: nowrap;
+
+        }
+
+
+        .csv-container td {
+
+            padding:
+                12px 15px;
+
+            border-bottom:
+                1px solid #e5e7eb;
+
+            border-right:
+                1px solid #e5e7eb;
+
+            white-space: nowrap;
+
+        }
+
+
+        .csv-container tr:nth-child(even) {
+
+            background: #f8fafc;
+
+        }
+
+
+        .csv-container tr:hover {
+
+            background: #eff6ff;
+
+        }
+
+
+        /* =====================================================
+           ARCHIVE PREVIEW
+        ====================================================== */
+
+        .archive-container {
+
+            width: min(950px, 96%);
+
+            max-height: 84vh;
+
+            overflow: auto;
+
+            padding: 25px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(17, 25, 39, 0.97),
+                    rgba(10, 16, 28, 0.96)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .archive-header {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+
+            margin-bottom: 20px;
+
+            padding-bottom: 20px;
+
+            border-bottom:
+                1px solid var(--border);
+
+        }
+
+
+        .archive-icon {
+
+            width: 60px;
+
+            height: 60px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background:
+                rgba(59, 130, 246, 0.12);
+
+            border:
+                1px solid rgba(96, 165, 250, 0.18);
+
+            font-size: 30px;
+
+        }
+
+
+        .archive-header h2 {
+
+            margin: 0;
+
+            overflow-wrap: anywhere;
+
+            font-size: 20px;
+
+        }
+
+
+        .archive-header p {
+
+            margin-top: 5px;
+
+            color: var(--text-secondary);
+
+            font-size: 13px;
+
+        }
+
+
+        .archive-list {
+
+            width: 100%;
+
+            border-collapse: separate;
+
+            border-spacing: 0;
+
+            overflow: hidden;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 12px;
+
+        }
+
+
+        .archive-list th {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 2;
+
+            padding:
+                13px 14px;
+
+            background:
+                #172554;
+
+            color: #bfdbfe;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-align: left;
+
+            letter-spacing: 0.03em;
+
+        }
+
+
+        .archive-list td {
+
+            padding:
+                13px 14px;
+
+            border-top:
+                1px solid var(--border);
+
+            color: #dbe4f0;
+
+            font-size: 13px;
+
+        }
+
+
+        .archive-list tr:hover td {
+
+            background:
+                rgba(59, 130, 246, 0.07);
+
+        }
+
+
+        .archive-loading {
+
+            padding: 45px 20px;
+
+            color: var(--text-secondary);
+
+            text-align: center;
+
+        }
+
+
+        .archive-loading::before {
+
+            content: "";
+
+            display: block;
+
+            width: 30px;
+
+            height: 30px;
+
+            margin:
+                0 auto 15px;
+
+            border:
+                3px solid rgba(148, 163, 184, 0.18);
+
+            border-top-color:
+                var(--blue);
+
+            border-radius: 50%;
+
+            animation:
+                spin 0.8s linear infinite;
+
+        }
+
+
+        @keyframes spin {
+
+            to {
+
+                transform: rotate(360deg);
+
+            }
+
+        }
+
+
+        .archive-error {
+
+            padding: 17px;
+
+            background:
+                rgba(127, 29, 29, 0.25);
+
+            border:
+                1px solid rgba(248, 113, 113, 0.25);
+
+            border-radius: 12px;
+
+            color: #fecaca;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* =====================================================
+           EMPTY / UNSUPPORTED
+        ====================================================== */
+
+        .other {
+
+            width: min(580px, 96%);
+
+            padding:
+                50px 35px;
+
+            text-align: center;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(17, 25, 39, 0.96),
+                    rgba(10, 16, 28, 0.96)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 22px;
+
+            box-shadow: var(--shadow);
+
+        }
+
+
+        .file-icon {
+
+            width: 105px;
+
+            height: 105px;
+
+            margin:
+                0 auto 25px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 25px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(59, 130, 246, 0.18),
+                    rgba(37, 99, 235, 0.05)
+                );
+
+            border:
+                1px solid rgba(96, 165, 250, 0.18);
+
+            font-size: 50px;
+
+        }
+
+
+        .other h2 {
+
+            margin-bottom: 13px;
+
+            overflow-wrap: anywhere;
+
+            font-size: 21px;
+
+        }
+
+
+        .other p {
+
+            margin:
+                7px auto;
+
+            max-width: 480px;
+
+            color: var(--text-secondary);
+
+            line-height: 1.65;
+
+            font-size: 14px;
+
+        }
+
+
+        /* =====================================================
+           DOWNLOAD BUTTON
+        ====================================================== */
+
+        .download {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            min-height: 48px;
+
+            margin-top: 22px;
+
+            padding:
+                0 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--blue),
+                    var(--blue-dark)
+                );
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 11px;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            box-shadow:
+                0 10px 25px
+                rgba(37, 99, 235, 0.25);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+
+        }
+
+
+        .download:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 14px 32px
+                rgba(37, 99, 235, 0.35);
+
+        }
+
+
+        .download:active {
+
+            transform:
+                translateY(0);
+
+        }
+
+
+        /* =====================================================
+           FILE DETAILS
+        ====================================================== */
+
+        .details {
+
+            margin-top: 25px;
+
+            padding-top: 17px;
+
+            border-top:
+                1px solid var(--border);
+
+            color: var(--text-muted);
+
+            font-size: 12px;
+
+        }
+
+
+        /* =====================================================
+           CUSTOM SCROLLBAR
+        ====================================================== */
+
+        ::-webkit-scrollbar {
+
+            width: 9px;
+
+            height: 9px;
+
+        }
+
+
+        ::-webkit-scrollbar-track {
+
+            background:
+                rgba(255, 255, 255, 0.025);
+
+        }
+
+
+        ::-webkit-scrollbar-thumb {
+
+            background:
+                #334155;
+
+            border-radius: 20px;
+
+        }
+
+
+        ::-webkit-scrollbar-thumb:hover {
+
+            background:
+                #475569;
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        @media (max-width: 700px) {
+
+            .header {
+
+                min-height: 64px;
+
+                padding:
+                    10px 12px;
+
+                gap: 9px;
+
+            }
+
+
+            .back {
+
+                min-height: 40px;
+
+                padding:
+                    0 11px;
+
+                font-size: 13px;
+
+            }
+
+
+            .file-header-icon {
+
+                width: 38px;
+
+                height: 38px;
+
+                border-radius: 10px;
+
+                font-size: 18px;
+
+            }
+
+
+            .filename-label {
+
+                font-size: 9px;
+
+            }
+
+
+            .filename {
+
+                max-width: 54vw;
+
+                font-size: 13px;
+
+            }
+
+
+            .preview {
+
+                min-height:
+                    calc(100vh - 64px);
+
+                padding: 12px;
+
+            }
+
+
+            .image-wrapper {
+
+                max-width: 100%;
+
+                max-height: 80vh;
+
+                min-width: 90px;
+
+                min-height: 90px;
+
+                padding: 5px;
+
+                border-radius: 14px;
+
+            }
+
+
+            .image {
+
+                max-width: 100%;
+
+                max-height: 78vh;
+
+                border-radius: 10px;
+
+            }
+
+
+            .image-loading {
+
+                font-size: 12px;
+
+            }
+
+
+            .image-error {
+
+                width: 100%;
+
+                padding: 25px 15px;
+
+            }
+
+
+            .document-wrapper {
+
+                width: 100%;
+
+                height: 78vh;
+
+                padding: 5px;
+
+                border-radius: 14px;
+
+            }
+
+
+            .pdf-frame,
+            .office-frame {
+
+                border-radius: 10px;
+
+            }
+
+
+            .media-wrapper {
+
+                width: 100%;
+
+                padding: 5px;
+
+                border-radius: 14px;
+
+            }
+
+
+            .video {
+
+                max-height: 70vh;
+
+                border-radius: 10px;
+
+            }
+
+
+            .audio-container {
+
+                width: 100%;
+
+                padding:
+                    35px 20px;
+
+                border-radius: 18px;
+
+            }
+
+
+            .audio-icon {
+
+                width: 75px;
+
+                height: 75px;
+
+                font-size: 30px;
+
+            }
+
+
+            .audio-container h2 {
+
+                font-size: 17px;
+
+            }
+
+
+            .text-container {
+
+                width: 100%;
+
+                height: 78vh;
+
+                border-radius: 14px;
+
+            }
+
+
+            .text-content {
+
+                padding: 18px;
+
+                font-size: 12px;
+
+                line-height: 1.65;
+
+            }
+
+
+            .csv-container {
+
+                width: 100%;
+
+                height: 78vh;
+
+                border-radius: 14px;
+
+            }
+
+
+            .csv-container th,
+            .csv-container td {
+
+                padding:
+                    10px 11px;
+
+                font-size: 12px;
+
+            }
+
+
+            .archive-container {
+
+                width: 100%;
+
+                max-height: 78vh;
+
+                padding: 17px;
+
+                border-radius: 16px;
+
+            }
+
+
+            .archive-header {
+
+                gap: 11px;
+
+                margin-bottom: 15px;
+
+                padding-bottom: 15px;
+
+            }
+
+
+            .archive-icon {
+
+                width: 48px;
+
+                height: 48px;
+
+                border-radius: 12px;
+
+                font-size: 24px;
+
+            }
+
+
+            .archive-header h2 {
+
+                font-size: 16px;
+
+            }
+
+
+            .archive-header p {
+
+                font-size: 11px;
+
+            }
+
+
+            .archive-list th,
+            .archive-list td {
+
+                padding:
+                    10px;
+
+                font-size: 11px;
+
+            }
+
+
+            .other {
+
+                width: 100%;
+
+                padding:
+                    40px 20px;
+
+                border-radius: 18px;
+
+            }
+
+
+            .file-icon {
+
+                width: 85px;
+
+                height: 85px;
+
+                margin-bottom: 20px;
+
+                border-radius: 20px;
+
+                font-size: 40px;
+
+            }
+
+
+            .other h2 {
+
+                font-size: 18px;
+
+            }
+
+
+            .other p {
+
+                font-size: 13px;
+
+            }
+
+
+            .download {
+
+                width: 100%;
+
+                min-height: 50px;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SMALL MOBILE
+        ====================================================== */
+
+        @media (max-width: 420px) {
+
+            .back {
+
+                padding:
+                    0 9px;
+
+            }
+
+
+            .back {
+
+                font-size: 0;
+
+            }
+
+
+            .back::before {
+
+                content: "←";
+
+                font-size: 20px;
+
+            }
+
+
+            .filename {
+
+                max-width: 65vw;
+
+            }
+
+
+            .file-header-icon {
+
+                display: none;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           REDUCED MOTION
+        ====================================================== */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+
+                scroll-behavior: auto !important;
+
+                animation-duration:
+                    0.01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    0.01ms !important;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+
+<header class="header">
+
+    <a
+        href="/dashboard"
+        class="back"
+        aria-label="Back to dashboard"
+    >
+        ← Back
+    </a>
+
+
+    <div class="file-header-info">
+
+        <div class="file-header-icon">
+
+            {% if content_type.startswith("image/") %}
+                🖼️
+
+            {% elif content_type == "application/pdf" %}
+                📕
+
+            {% elif name.lower().endswith(".doc") or name.lower().endswith(".docx") %}
+                📘
+
+            {% elif name.lower().endswith(".xls") or name.lower().endswith(".xlsx") %}
+                📊
+
+            {% elif name.lower().endswith(".ppt") or name.lower().endswith(".pptx") %}
+                📙
+
+            {% elif content_type.startswith("video/") %}
+                🎬
+
+            {% elif content_type.startswith("audio/") %}
+                🎵
+
+            {% elif name.lower().endswith(".zip") or name.lower().endswith(".rar") or name.lower().endswith(".7z") %}
+                🗜️
+
+            {% else %}
+                📄
+            {% endif %}
+
+        </div>
+
+
+        <div class="filename-wrapper">
+
+            <span class="filename-label">
+                File Preview
+            </span>
+
+
+            <span
+                class="filename"
+                title="{{ name }}"
+            >
+                {{ name }}
+            </span>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     PREVIEW
+====================================================== -->
+
+<main class="preview">
+
+    <div class="preview-card">
+
+
+        <!-- =================================================
+             IMAGE
+        ================================================== -->
+
+        {% if content_type.startswith("image/") %}
+
+            <div class="image-wrapper">
+
+                <div
+                    class="image-loading"
+                    id="image-loading"
+                >
+
+                    <div class="image-spinner"></div>
+
+                    <span>
+                        Loading image...
+                    </span>
+
+                </div>
+
+
+                <img
+                    src="{{ url }}"
+                    class="image"
+                    id="preview-image"
+                    alt="{{ name }}"
+                    loading="eager"
+                    decoding="async"
+                    onload="imageLoaded()"
+                    onerror="imageFailed()"
+                >
+
+
+                <div
+                    class="image-error"
+                    id="image-error"
+                >
+
+                    <div class="image-error-icon">
+                        🖼️
+                    </div>
+
+
+                    <h2>
+                        Unable to display image
+                    </h2>
+
+
+                    <p>
+                        The image could not be loaded from
+                        cloud storage. Please try again or
+                        download the original file.
+                    </p>
+
+
+                    <a
+                        href="{{ url }}"
+                        class="download"
+                        download
+                    >
+                        ⬇ Download Image
+                    </a>
+
+                </div>
+
+            </div>
+
+
+        <!-- =================================================
+             PDF
+        ================================================== -->
+
+        {% elif content_type == "application/pdf" %}
+
+            <div class="document-wrapper">
+
+                <iframe
+                    src="{{ url }}"
+                    class="pdf-frame"
+                    title="{{ name }}"
+                >
+                </iframe>
+
+            </div>
+
+
+        <!-- =================================================
+             DOC / DOCX
+        ================================================== -->
+
+        {% elif
+            name.lower().endswith(".doc")
+            or name.lower().endswith(".docx")
+        %}
+
+            <div class="document-wrapper">
+
+                <iframe
+                    src="https://view.officeapps.live.com/op/embed.aspx?src={{ url | urlencode }}"
+                    class="office-frame"
+                    title="{{ name }}"
+                    allowfullscreen
+                >
+                </iframe>
+
+            </div>
+
+
+        <!-- =================================================
+             XLS / XLSX
+        ================================================== -->
+
+        {% elif
+            name.lower().endswith(".xls")
+            or name.lower().endswith(".xlsx")
+        %}
+
+            <div class="document-wrapper">
+
+                <iframe
+                    src="https://view.officeapps.live.com/op/embed.aspx?src={{ url | urlencode }}"
+                    class="office-frame"
+                    title="{{ name }}"
+                    allowfullscreen
+                >
+                </iframe>
+
+            </div>
+
+
+        <!-- =================================================
+             PPT / PPTX
+        ================================================== -->
+
+        {% elif
+            name.lower().endswith(".ppt")
+            or name.lower().endswith(".pptx")
+        %}
+
+            <div class="document-wrapper">
+
+                <iframe
+                    src="https://view.officeapps.live.com/op/embed.aspx?src={{ url | urlencode }}"
+                    class="office-frame"
+                    title="{{ name }}"
+                    allowfullscreen
+                >
+                </iframe>
+
+            </div>
+
+
+        <!-- =================================================
+             VIDEO
+        ================================================== -->
+
+        {% elif content_type.startswith("video/") %}
+
+            <div class="media-wrapper">
+
+                <video
+                    class="video"
+                    controls
+                    preload="metadata"
+                >
+
+                    <source
+                        src="{{ url }}"
+                        type="{{ content_type }}"
+                    >
+
+                    Your browser does not support video playback.
+
+                </video>
+
+            </div>
+
+
+        <!-- =================================================
+             AUDIO
+        ================================================== -->
+
+        {% elif content_type.startswith("audio/") %}
+
+            <div class="audio-container">
+
+                <div class="audio-icon">
+                    🎵
+                </div>
+
+
+                <h2 title="{{ name }}">
+                    {{ name }}
+                </h2>
+
+
+                <audio
+                    controls
+                    preload="metadata"
+                >
+
+                    <source
+                        src="{{ url }}"
+                        type="{{ content_type }}"
+                    >
+
+                    Your browser does not support audio playback.
+
+                </audio>
+
+            </div>
+
+
+        <!-- =================================================
+             CSV
+        ================================================== -->
+
+        {% elif
+            content_type == "text/csv"
+            or name.lower().endswith(".csv")
+        %}
+
+            <div class="csv-container">
+
+                {{ csv_table | safe }}
+
+            </div>
+
+
+        <!-- =================================================
+             TEXT / CODE
+        ================================================== -->
+
+        {% elif
+            content_type.startswith("text/")
+            or content_type == "application/json"
+            or content_type == "application/javascript"
+            or content_type == "application/xml"
+            or content_type == "application/sql"
+        %}
+
+            <div class="text-container">
+
+                <div class="text-toolbar">
+
+                    <span class="window-dot"></span>
+
+                    <span class="window-dot"></span>
+
+                    <span class="window-dot"></span>
+
+                    <span class="code-label">
+                        {{ name }}
+                    </span>
+
+                </div>
+
+
+                <pre class="text-content">{{ text_content }}</pre>
+
+            </div>
+
+
+        <!-- =================================================
+             ZIP
+        ================================================== -->
+
+        {% elif name.lower().endswith(".zip") %}
+
+            <div class="archive-container">
+
+                <div class="archive-header">
+
+                    <div class="archive-icon">
+                        🗜️
+                    </div>
+
+
+                    <div>
+
+                        <h2>
+                            {{ name }}
+                        </h2>
+
+                        <p>
+                            ZIP archive contents
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="zip-loading"
+                    class="archive-loading"
+                >
+                    Loading ZIP contents...
+                </div>
+
+
+                <div
+                    id="zip-result"
+                    style="display: none;"
+                >
+
+                    <table class="archive-list">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    File / Folder
+                                </th>
+
+                                <th>
+                                    Type
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="zip-files">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div
+                    id="zip-error"
+                    style="display: none;"
+                >
+                </div>
+
+            </div>
+
+
+        <!-- =================================================
+             RAR
+        ================================================== -->
+
+        {% elif name.lower().endswith(".rar") %}
+
+            <div class="other">
+
+                <div class="file-icon">
+                    🗜️
+                </div>
+
+
+                <h2>
+                    {{ name }}
+                </h2>
+
+
+                <p>
+                    RAR archive preview is not supported
+                    directly by most browsers.
+                </p>
+
+
+                <p>
+                    Download the file and open it using
+                    WinRAR, 7-Zip, or another archive application.
+                </p>
+
+
+                <a
+                    href="{{ url }}"
+                    class="download"
+                    download
+                >
+                    ⬇ Download RAR
+                </a>
+
+
+                <div class="details">
+
+                    File type:
+                    {{ content_type }}
+
+                </div>
+
+            </div>
+
+
+        <!-- =================================================
+             7Z
+        ================================================== -->
+
+        {% elif name.lower().endswith(".7z") %}
+
+            <div class="other">
+
+                <div class="file-icon">
+                    🗜️
+                </div>
+
+
+                <h2>
+                    {{ name }}
+                </h2>
+
+
+                <p>
+                    7Z archive preview is not supported
+                    directly by most browsers.
+                </p>
+
+
+                <p>
+                    Download the file and open it using
+                    7-Zip or another compatible application.
+                </p>
+
+
+                <a
+                    href="{{ url }}"
+                    class="download"
+                    download
+                >
+                    ⬇ Download 7Z
+                </a>
+
+
+                <div class="details">
+
+                    File type:
+                    {{ content_type }}
+
+                </div>
+
+            </div>
+
+
+        <!-- =================================================
+             OTHER FILES
+        ================================================== -->
+
+        {% else %}
+
+            <div class="other">
+
+                <div class="file-icon">
+                    📄
+                </div>
+
+
+                <h2>
+                    {{ name }}
+                </h2>
+
+
+                <p>
+                    This file format cannot be previewed
+                    directly in the browser.
+                </p>
+
+
+                <p>
+                    You can download the file and open it
+                    using the appropriate application.
+                </p>
+
+
+                <a
+                    href="{{ url }}"
+                    class="download"
+                    download
+                >
+                    ⬇ Download File
+                </a>
+
+
+                <div class="details">
+
+                    File type:
+                    {{ content_type }}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     IMAGE PREVIEW JAVASCRIPT
+====================================================== -->
+
+{% if content_type.startswith("image/") %}
+
+<script>
+
+    function imageLoaded() {
+
+        const image =
+            document.getElementById(
+                "preview-image"
+            );
+
+
+        const loading =
+            document.getElementById(
+                "image-loading"
+            );
+
+
+        if (image) {
+
+            image.classList.add(
+                "loaded"
+            );
+
+        }
+
+
+        if (loading) {
+
+            loading.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    function imageFailed() {
+
+        const image =
+            document.getElementById(
+                "preview-image"
+            );
+
+
+        const loading =
+            document.getElementById(
+                "image-loading"
+            );
+
+
+        const errorBox =
+            document.getElementById(
+                "image-error"
+            );
+
+
+        if (image) {
+
+            image.style.display =
+                "none";
+
+        }
+
+
+        if (loading) {
+
+            loading.style.display =
+                "none";
+
+        }
+
+
+        if (errorBox) {
+
+            errorBox.style.display =
+                "block";
+
+        }
+
+    }
+
+
+</script>
+
+{% endif %}
+
+
+<!-- =====================================================
+     ZIP PREVIEW JAVASCRIPT
+====================================================== -->
+
+{% if name.lower().endswith(".zip") %}
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const zipUrl =
+                {{ url | tojson }};
+
+
+            const loading =
+                document.getElementById(
+                    "zip-loading"
+                );
+
+
+            const result =
+                document.getElementById(
+                    "zip-result"
+                );
+
+
+            const errorBox =
+                document.getElementById(
+                    "zip-error"
+                );
+
+
+            const fileTable =
+                document.getElementById(
+                    "zip-files"
+                );
+
+
+            /* =========================================
+               FORMAT FILE SIZE
+            ========================================== */
+
+            function formatSize(bytes) {
+
+                if (bytes === 0) {
+
+                    return "0 B";
+
+                }
+
+
+                const units = [
+                    "B",
+                    "KB",
+                    "MB",
+                    "GB"
+                ];
+
+
+                const index =
+                    Math.floor(
+                        Math.log(bytes) /
+                        Math.log(1024)
+                    );
+
+
+                const size =
+                    bytes /
+                    Math.pow(1024, index);
+
+
+                return (
+                    size.toFixed(
+                        index === 0 ? 0 : 2
+                    )
+                    +
+                    " "
+                    +
+                    units[index]
+                );
+
+            }
+
+
+            /* =========================================
+               FILE TYPE
+            ========================================== */
+
+            function getFileType(filename) {
+
+                if (
+                    filename.endsWith("/")
+                ) {
+
+                    return "Folder";
+
+                }
+
+
+                const extension =
+                    filename
+                        .split(".")
+                        .pop()
+                        .toLowerCase();
+
+
+                const types = {
+
+                    pdf: "PDF",
+
+                    doc: "Word",
+
+                    docx: "Word",
+
+                    xls: "Excel",
+
+                    xlsx: "Excel",
+
+                    ppt: "PowerPoint",
+
+                    pptx: "PowerPoint",
+
+                    jpg: "Image",
+
+                    jpeg: "Image",
+
+                    png: "Image",
+
+                    gif: "Image",
+
+                    webp: "Image",
+
+                    svg: "Image",
+
+                    bmp: "Image",
+
+                    ico: "Image",
+
+                    avif: "Image",
+
+                    mp4: "Video",
+
+                    webm: "Video",
+
+                    avi: "Video",
+
+                    mov: "Video",
+
+                    mp3: "Audio",
+
+                    wav: "Audio",
+
+                    ogg: "Audio",
+
+                    txt: "Text",
+
+                    csv: "CSV",
+
+                    html: "HTML",
+
+                    css: "CSS",
+
+                    js: "JavaScript",
+
+                    py: "Python",
+
+                    java: "Java",
+
+                    json: "JSON",
+
+                    xml: "XML",
+
+                    sql: "SQL",
+
+                    zip: "ZIP",
+
+                    rar: "RAR",
+
+                    "7z": "7Z"
+
+                };
+
+
+                return (
+                    types[extension]
+                    ||
+                    extension.toUpperCase()
+                );
+
+            }
+
+
+            /* =========================================
+               LOAD ZIP
+            ========================================== */
+
+            fetch(zipUrl)
+
+                .then(
+                    function (response) {
+
+                        if (!response.ok) {
+
+                            throw new Error(
+                                "Unable to download ZIP file."
+                            );
+
+                        }
+
+
+                        return response.arrayBuffer();
+
+                    }
+                )
+
+
+                .then(
+                    function (data) {
+
+                        return JSZip.loadAsync(
+                            data
+                        );
+
+                    }
+                )
+
+
+                .then(
+                    function (zip) {
+
+                        fileTable.innerHTML = "";
+
+
+                        const entries =
+                            Object.values(
+                                zip.files
+                            );
+
+
+                        if (
+                            entries.length === 0
+                        ) {
+
+                            loading.style.display =
+                                "none";
+
+
+                            errorBox.style.display =
+                                "block";
+
+
+                            errorBox.className =
+                                "archive-error";
+
+
+                            errorBox.textContent =
+                                "This ZIP archive is empty.";
+
+
+                            return;
+
+                        }
+
+
+                        entries.forEach(
+                            function (entry) {
+
+                                const row =
+                                    document.createElement(
+                                        "tr"
+                                    );
+
+
+                                const nameCell =
+                                    document.createElement(
+                                        "td"
+                                    );
+
+
+                                const typeCell =
+                                    document.createElement(
+                                        "td"
+                                    );
+
+
+                                const statusCell =
+                                    document.createElement(
+                                        "td"
+                                    );
+
+
+                                nameCell.textContent =
+                                    entry.name;
+
+
+                                if (entry.dir) {
+
+                                    typeCell.textContent =
+                                        "Folder";
+
+
+                                    statusCell.textContent =
+                                        "-";
+
+                                } else {
+
+                                    typeCell.textContent =
+                                        getFileType(
+                                            entry.name
+                                        );
+
+
+                                    statusCell.textContent =
+                                        "Inside archive";
+
+                                }
+
+
+                                row.appendChild(
+                                    nameCell
+                                );
+
+
+                                row.appendChild(
+                                    typeCell
+                                );
+
+
+                                row.appendChild(
+                                    statusCell
+                                );
+
+
+                                fileTable.appendChild(
+                                    row
+                                );
+
+                            }
+                        );
+
+
+                        loading.style.display =
+                            "none";
+
+
+                        result.style.display =
+                            "block";
+
+                    }
+                )
+
+
+                .catch(
+                    function (error) {
+
+                        console.error(error);
+
+
+                        loading.style.display =
+                            "none";
+
+
+                        errorBox.style.display =
+                            "block";
+
+
+                        errorBox.className =
+                            "archive-error";
+
+
+                        errorBox.innerHTML =
+
+                            "Unable to preview this ZIP archive."
+                            +
+                            "<br><br>"
+                            +
+                            "The archive may be corrupted, encrypted, "
+                            +
+                            "or the storage URL may not allow browser access.";
+
+                    }
+                );
+
+        }
+    );
+
+</script>
+
+{% endif %}
+
+
+</body>
+
+</html>
